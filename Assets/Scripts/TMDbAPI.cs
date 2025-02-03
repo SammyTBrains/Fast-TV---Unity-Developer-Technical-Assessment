@@ -4,7 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class TMDbAPI : MonoBehaviour
+public class TMDbAPI : MonoBehaviour, IMovieAPI
 {
     public static TMDbAPI Instance { get; private set; }
 
@@ -15,6 +15,13 @@ public class TMDbAPI : MonoBehaviour
 
     private const string CachePrefix = "MovieSearchCache_";
     private const int CacheExpiryMinutes = 60;
+
+    private IUIHandler uIHandler;
+
+    public void SetUIHandler(IUIHandler uIHandler)
+    {
+        this.uIHandler = uIHandler;
+    }
 
     #region MonoBehaviour Methods
     private void Awake()
@@ -51,7 +58,7 @@ public class TMDbAPI : MonoBehaviour
         else
         {
             Debug.LogWarning("No API Key found. Prompting user...");
-            UIManager.Instance.ShowApiKeyPrompt();
+            uIHandler.ShowApiKeyPrompt();
         }
     }
 

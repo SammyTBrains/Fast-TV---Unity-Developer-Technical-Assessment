@@ -4,7 +4,7 @@ using TMPro;
 using static TMDbAPI;
 using UnityEngine.UI;//Use defined data models
 
-public class UIManager : MonoBehaviour
+public class UIManager : MonoBehaviour, IUIHandler
 {
     public static UIManager Instance { get; private set; }
 
@@ -22,6 +22,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private Transform _movieDetailsScreenContent;
     [SerializeField] private GameObject _genrePrefab, _genreContainer;
     [SerializeField] private GameObject _castPrefab, _castContainer;
+
+    private IMovieAPI movieAPI;
+
+    public void SetMovieAPI(IMovieAPI movieAPI)
+    {
+        this.movieAPI = movieAPI;
+    }
 
     private void Awake()
     {
@@ -48,7 +55,7 @@ public class UIManager : MonoBehaviour
 
         if (!string.IsNullOrEmpty(apiKey))
         {
-            TMDbAPI.Instance.SetApiKey(apiKey);
+            movieAPI.SetApiKey(apiKey);
             _apiKeyPromptPanel.SetActive(false);
             _searchScreen.SetActive(true);
         }
@@ -60,12 +67,12 @@ public class UIManager : MonoBehaviour
 
     public void SearchMovies()
     {
-        StartCoroutine(TMDbAPI.Instance.SearchMovies(_searchInputField.text, OnSearchSuccess, OnError));
+        StartCoroutine(movieAPI.SearchMovies(_searchInputField.text, OnSearchSuccess, OnError));
     }
 
     private void GetMovieDetails(int movieId)
     {
-        StartCoroutine(TMDbAPI.Instance.GetMovieDetails(movieId, OnMovieDetailsSuccess, OnError));
+        StartCoroutine(movieAPI.GetMovieDetails(movieId, OnMovieDetailsSuccess, OnError));
     }
 
     public void BackToSearchScreen()
@@ -158,7 +165,7 @@ public class UIManager : MonoBehaviour
 
     private void SetMovieImage(MovieImageReqInfo movie, Image image)
     {
-        TMDbAPI.Instance.GetMovieImage(movie, (Texture2D texture) =>
+        movieAPI.GetMovieImage(movie, (Texture2D texture) =>
         {
             if (texture != null)
             {
