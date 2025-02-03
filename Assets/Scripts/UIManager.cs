@@ -91,6 +91,7 @@ public class UIManager : MonoBehaviour
         info.title = movieDetails.title;
         info.poster_path = movieDetails.poster_path;
 
+        _movieDetailsScreenContent.Find("Poster").GetComponent<Image>().sprite = null;//Clear previous Image
         SetMovieImage(info, _movieDetailsScreenContent.Find("Poster").GetComponent<Image>());
         _movieDetailsScreenContent.Find("Title").GetComponent<TMP_Text>().text = movieDetails.title;
         _movieDetailsScreenContent.Find("Release Date").GetComponent<TMP_Text>().text = movieDetails.release_date;
