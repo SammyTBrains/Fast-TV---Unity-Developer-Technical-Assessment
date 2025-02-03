@@ -26,12 +26,6 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    //TEST CACHING!!!!!
-    //THE CACHE MANAGER AND BATCH CLEAN UP THING
-    //DELETE NETWORK MANAGER
-    //LOADER AFTER MOVIE IMAGES?
-    //PROMPT USERS TO INPUT THEIR OWN API KEY ON FIRST LAUNCH - CHECK DOC TO CONFIRM
-
     void Start()
     {
         // GET THE SET API KEY BY USER - CHECK DOC TO CONFIRM
@@ -50,7 +44,7 @@ public class UIManager : MonoBehaviour
 
     private void OnSearchSuccess(List<MovieSearchResult> results)
     {
-        ClearSearchResults();
+        ClearSearchResults(results);
 
         // Display new search results in the UI
         foreach (MovieSearchResult movie in results)
@@ -93,10 +87,14 @@ public class UIManager : MonoBehaviour
         // Example: Show an error message in the UI
     }
 
-    private void ClearSearchResults()
+    private void ClearSearchResults(List<MovieSearchResult> results)
     {
-        // Add logic to clear the search results UI (e.g., remove old movie posters and titles)
+
         Debug.Log("Clearing search results.");
+        foreach (Transform child in _scrollViewContent)
+        {
+            Destroy(child.gameObject);
+        }
     }
 
     private void SetMovieImage(MovieSearchResult movie, Image image)
