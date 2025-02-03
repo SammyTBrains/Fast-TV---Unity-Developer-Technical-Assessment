@@ -10,6 +10,10 @@ public class TMDbAPI : MonoBehaviour
     private const string BaseUrl = "https://api.themoviedb.org/3";
     private string _apiKey;
 
+    private const string CachePrefix = "MovieSearchCache_";
+    private const int CacheExpiryMinutes = 60;
+
+    #region MonoBehaviour Methods
     private void Awake()
     {
         if (Instance == null)
@@ -22,7 +26,9 @@ public class TMDbAPI : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    #endregion
 
+    #region API Methods
     public void SetApiKey(string apiKey)
     {
         _apiKey = apiKey;
@@ -30,25 +36,40 @@ public class TMDbAPI : MonoBehaviour
 
     public IEnumerator SearchMovies(string query, System.Action<List<MovieSearchResult>> onSuccess, System.Action<string> onError)
     {
+        string cacheKey = GetCacheKey(query);
+
+        if (TryGetCachedResponse(cacheKey, out string cachedResponse))
+        {
+            MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(cachedResponse);
+            onSuccess?.Invoke(response.results);
+            yield break;
+        }
+
         string url = $"{BaseUrl}/search/movie?api_key={_apiKey}&query={UnityWebRequest.EscapeURL(query)}";
 
-        using UnityWebRequest request = UnityWebRequest.Get(url);
-        yield return request.SendWebRequest();
+        using (UnityWebRequest request = UnityWebRequest.Get(url))
+        {
+            yield return request.SendWebRequest();
 
-        if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-        {
-            onError?.Invoke(request.error);
-        }
-        else
-        {
-            if (request.downloadHandler.text == null )
+            if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
             {
-                onError?.Invoke("No results found.");
+                onError?.Invoke(request.error);
             }
+            else
+            {
+                if (request.downloadHandler.text == null)
+                {
+                    onError?.Invoke("No results found.");
+                    //Handle in UI - listen for it
+                    //Return
+                }
 
-            string jsonResponse = request.downloadHandler.text;
-            MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(jsonResponse);
-            onSuccess?.Invoke(response.results);
+                string jsonResponse = request.downloadHandler.text;
+                CacheResponse(cacheKey, jsonResponse);
+
+                MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(jsonResponse);
+                onSuccess?.Invoke(response.results);
+            }
         }
     }
 
@@ -70,7 +91,41 @@ public class TMDbAPI : MonoBehaviour
             onSuccess?.Invoke(movieDetails);
         }
     }
+    #endregion
 
+    #region Utility Methods
+    private string GetCacheKey(string query)
+    {
+        return $"{CachePrefix}{query}";
+    }
+
+    private void CacheResponse(string key, string jsonResponse)
+    {
+        string timestamp = System.DateTime.UtcNow.ToString("O");
+        PlayerPrefs.SetString(key, jsonResponse);
+        PlayerPrefs.SetString($"{key}_timestamp", timestamp);
+        PlayerPrefs.Save();
+    }
+
+    private bool TryGetCachedResponse(string key, out string jsonResponse)
+    {
+        if (PlayerPrefs.HasKey(key))
+        {
+            string timestamp = PlayerPrefs.GetString($"{key}_timestamp");
+            System.DateTime cachedTime = System.DateTime.Parse(timestamp);
+            if ((System.DateTime.UtcNow - cachedTime).TotalMinutes < CacheExpiryMinutes)
+            {
+                jsonResponse = PlayerPrefs.GetString(key);
+                return true;
+            }
+        }
+
+        jsonResponse = null;
+        return false;
+    }
+    #endregion
+
+    #region Data Models
     [System.Serializable]
     public class MovieSearchResult
     {
@@ -114,4 +169,5 @@ public class TMDbAPI : MonoBehaviour
         public string name;
         public string character;
     }
+    #endregion
 }
