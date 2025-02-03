@@ -55,16 +55,16 @@ public class UIManager : MonoBehaviour
         // Display new search results in the UI
         foreach (MovieSearchResult movie in results)
         {
-           
+
             // Add logic to display movie posters and titles in the UI
-           
+
 
             GameObject newMovie = Instantiate(_movieContainerPrefab, _scrollViewContent);
 
             newMovie.transform.Find("Title").GetComponent<TMP_Text>().text = movie.title;
             newMovie.transform.Find("Release Date").GetComponent<TMP_Text>().text = movie.release_date;
             newMovie.transform.Find("Overview").GetComponent<TMP_Text>().text = movie.overview;
-            newMovie.transform.Find("Image").GetComponent<Image>().sprite = LoadMovieImage(movie);
+            SetMovieImage(movie, newMovie.transform.Find("Image").GetComponent<Image>());
         }
     }
 
@@ -99,23 +99,15 @@ public class UIManager : MonoBehaviour
         Debug.Log("Clearing search results.");
     }
 
-    private Sprite LoadMovieImage(MovieSearchResult movie)
+    private void SetMovieImage(MovieSearchResult movie, Image image)
     {
-        Sprite movieImage= null;
-
         TMDbAPI.Instance.GetMovieImage(movie, (Texture2D texture) =>
         {
             if (texture != null)
             {
-                movieImage =  SpriteFromTexture(texture);
-            }
-            else
-            {
-                Debug.LogError("Failed to load movie image.");
+                image.sprite = SpriteFromTexture(texture);
             }
         });
-
-        return movieImage;
     }
 
     Sprite SpriteFromTexture(Texture2D texture)
