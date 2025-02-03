@@ -60,8 +60,7 @@ public class TMDbAPI : MonoBehaviour
                 if (request.downloadHandler.text == null)
                 {
                     onError?.Invoke("No results found.");
-                    //Handle in UI - listen for it
-                    //Return
+                    yield break;
                 }
 
                 string jsonResponse = request.downloadHandler.text;
@@ -117,6 +116,10 @@ public class TMDbAPI : MonoBehaviour
             {
                 jsonResponse = PlayerPrefs.GetString(key);
                 return true;
+            }
+            else
+            {
+                PlayerPrefs.DeleteKey(key);//Clean up cache
             }
         }
 
