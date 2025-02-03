@@ -2,6 +2,9 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+using System;
+using UnityEditor.Search;
 
 public class TMDbAPI : MonoBehaviour
 {
@@ -9,6 +12,7 @@ public class TMDbAPI : MonoBehaviour
 
     private const string BaseUrl = "https://api.themoviedb.org/3";
     private string _apiKey;
+    private const string _baseImageUrl = "https://image.tmdb.org/t/p/original";
 
     private const string CachePrefix = "MovieSearchCache_";
     private const int CacheExpiryMinutes = 60;
@@ -71,6 +75,42 @@ public class TMDbAPI : MonoBehaviour
             }
         }
     }
+
+    public void GetMovieImage(MovieSearchResult movie, Action<Texture2D> callback)
+    {
+        if (string.IsNullOrEmpty(movie.poster_path) )
+        {
+            Debug.Log(movie.poster_path);
+            Debug.LogWarning($"Invalid poster path for movie: {movie.title}");
+            callback?.Invoke(null);
+            return;
+        }
+
+        StartCoroutine(DownloadMovieImage(movie, callback));
+    }
+
+
+    private IEnumerator DownloadMovieImage(MovieSearchResult movie, Action<Texture2D> callback)
+    {
+        string imageUrl = $"{_baseImageUrl}/{movie.poster_path}";
+        UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Texture2D texture = ((DownloadHandlerTexture)request.downloadHandler).texture;
+            callback?.Invoke(texture);
+        }
+        else
+        {
+            Debug.LogError($"Error loading image ({imageUrl}): {request.error}");
+            Debug.Log($"Fetching image from: {_baseImageUrl}{movie.poster_path}");//JHJHJHSDJSDJHJHJH
+
+            callback?.Invoke(null);
+        }
+    }
+
 
     public IEnumerator GetMovieDetails(int movieId, System.Action<MovieDetails> onSuccess, System.Action<string> onError)
     {

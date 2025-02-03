@@ -1,13 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using static TMDbAPI;//Use defined data models
+using static TMDbAPI;
+using UnityEngine.UI;//Use defined data models
 
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
-    [SerializeField] private TMP_InputField searchInputField;
+    [SerializeField] private TMP_InputField _searchInputField;
+
+    [SerializeField] private GameObject _movieContainerPrefab;
+    [SerializeField] private Transform _scrollViewContent;
 
     private void Awake()
     {
@@ -25,6 +29,7 @@ public class UIManager : MonoBehaviour
     //TEST CACHING!!!!!
     //THE CACHE MANAGER AND BATCH CLEAN UP THING
     //DELETE NETWORK MANAGER
+    //LOADER AFTER MOVIE IMAGES?
     //PROMPT USERS TO INPUT THEIR OWN API KEY ON FIRST LAUNCH - CHECK DOC TO CONFIRM
 
     void Start()
@@ -35,7 +40,7 @@ public class UIManager : MonoBehaviour
 
     public void SearchMovies()
     {
-        StartCoroutine(TMDbAPI.Instance.SearchMovies(searchInputField.text, OnSearchSuccess, OnError));
+        StartCoroutine(TMDbAPI.Instance.SearchMovies(_searchInputField.text, OnSearchSuccess, OnError));
     }
 
     public void GetMovieDetails(int movieId)
@@ -48,10 +53,18 @@ public class UIManager : MonoBehaviour
         ClearSearchResults();
 
         // Display new search results in the UI
-        foreach (var movie in results)
+        foreach (MovieSearchResult movie in results)
         {
-            Debug.Log($"Found: {movie.title}");
+           
             // Add logic to display movie posters and titles in the UI
+           
+
+            GameObject newMovie = Instantiate(_movieContainerPrefab, _scrollViewContent);
+
+            newMovie.transform.Find("Title").GetComponent<TMP_Text>().text = movie.title;
+            newMovie.transform.Find("Release Date").GetComponent<TMP_Text>().text = movie.release_date;
+            newMovie.transform.Find("Overview").GetComponent<TMP_Text>().text = movie.overview;
+            newMovie.transform.Find("Image").GetComponent<Image>().sprite = LoadMovieImage(movie);
         }
     }
 
@@ -84,5 +97,29 @@ public class UIManager : MonoBehaviour
     {
         // Add logic to clear the search results UI (e.g., remove old movie posters and titles)
         Debug.Log("Clearing search results.");
+    }
+
+    private Sprite LoadMovieImage(MovieSearchResult movie)
+    {
+        Sprite movieImage= null;
+
+        TMDbAPI.Instance.GetMovieImage(movie, (Texture2D texture) =>
+        {
+            if (texture != null)
+            {
+                movieImage =  SpriteFromTexture(texture);
+            }
+            else
+            {
+                Debug.LogError("Failed to load movie image.");
+            }
+        });
+
+        return movieImage;
+    }
+
+    Sprite SpriteFromTexture(Texture2D texture)
+    {
+        return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
     }
 }
