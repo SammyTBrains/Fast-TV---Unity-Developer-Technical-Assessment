@@ -13,6 +13,13 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject _movieContainerPrefab;
     [SerializeField] private Transform _scrollViewContent;
 
+    [SerializeField] private GameObject _searchScreen;
+    [SerializeField] private GameObject _movieDetailsScreen;
+
+    [SerializeField] private Transform _movieDetailsScreenContent;
+    [SerializeField] private GameObject _genrePrefab, _genreContainer;
+    [SerializeField] private GameObject _castPrefab, _castContainer;
+
     private void Awake()
     {
         if (Instance == null)
@@ -37,40 +44,74 @@ public class UIManager : MonoBehaviour
         StartCoroutine(TMDbAPI.Instance.SearchMovies(_searchInputField.text, OnSearchSuccess, OnError));
     }
 
-    public void GetMovieDetails(int movieId)
+    private void GetMovieDetails(int movieId)
     {
         StartCoroutine(TMDbAPI.Instance.GetMovieDetails(movieId, OnMovieDetailsSuccess, OnError));
     }
 
+    public void BackToSearchScreen()
+    {
+        _movieDetailsScreen.SetActive(false);
+        _searchScreen.SetActive(true);
+    }
+
     private void OnSearchSuccess(List<MovieSearchResult> results)
     {
-        ClearSearchResults(results);
+        ClearChildren(_scrollViewContent);
 
-        // Display new search results in the UI
         foreach (MovieSearchResult movie in results)
         {
-
-            // Add logic to display movie posters and titles in the UI
-
-
             GameObject newMovie = Instantiate(_movieContainerPrefab, _scrollViewContent);
 
+            MovieImageReqInfo info = new MovieImageReqInfo();
+            info.title = movie.title;
+            info.poster_path = movie.poster_path;
+
+            SetMovieImage(info, newMovie.transform.Find("Image").GetComponent<Image>());
             newMovie.transform.Find("Title").GetComponent<TMP_Text>().text = movie.title;
             newMovie.transform.Find("Release Date").GetComponent<TMP_Text>().text = movie.release_date;
             newMovie.transform.Find("Overview").GetComponent<TMP_Text>().text = movie.overview;
-            SetMovieImage(movie, newMovie.transform.Find("Image").GetComponent<Image>());
+
+            // Get the Button component
+            Button movieButton = newMovie.GetComponent<Button>();
+            if (movieButton != null)
+            {
+                int movieId = movie.id; // Store movieId in a local variable to avoid closure issues
+                movieButton.onClick.AddListener(() => GetMovieDetails(movieId));
+            }
         }
     }
 
     private void OnMovieDetailsSuccess(MovieDetails movieDetails)
     {
-        // Display movie details in the UI
-        Debug.Log($"Movie Details: {movieDetails.title}");
-        Debug.Log($"Synopsis: {movieDetails.overview}");
-        Debug.Log($"Release Date: {movieDetails.release_date}");
-        Debug.Log($"Rating: {movieDetails.vote_average}");
+        _searchScreen.SetActive(false);
+        _movieDetailsScreen.SetActive(true);
 
-        // Add logic to display movie details in the UI
+        MovieImageReqInfo info = new MovieImageReqInfo();
+        info.title = movieDetails.title;
+        info.poster_path = movieDetails.poster_path;
+
+        SetMovieImage(info, _movieDetailsScreenContent.Find("Poster").GetComponent<Image>());
+        _movieDetailsScreenContent.Find("Title").GetComponent<TMP_Text>().text = movieDetails.title;
+        _movieDetailsScreenContent.Find("Release Date").GetComponent<TMP_Text>().text = movieDetails.release_date;
+        _movieDetailsScreenContent.Find("Synopsis").GetComponent<TMP_Text>().text = movieDetails.overview;
+        _movieDetailsScreenContent.Find("Vote Average").GetComponent<TMP_Text>().text = movieDetails.vote_average.ToString("F2");
+
+
+        ClearChildren(_genreContainer.transform);
+        foreach (Genre genre in movieDetails.genres)
+        {
+            GameObject newGenre = Instantiate(_genrePrefab, _genreContainer.transform);
+
+            newGenre.GetComponent<TextMeshProUGUI>().text = genre.name;
+        }
+
+        ClearChildren(_castContainer.transform);
+        foreach (CastMember cast in movieDetails.cast)
+        {
+            GameObject castMember = Instantiate(_castPrefab, _castContainer.transform);
+            castMember.GetComponent<TextMeshProUGUI>().text = cast.name;
+        }
     }
 
     private void OnError(string error)
@@ -87,17 +128,15 @@ public class UIManager : MonoBehaviour
         // Example: Show an error message in the UI
     }
 
-    private void ClearSearchResults(List<MovieSearchResult> results)
+    private void ClearChildren(Transform parentContainer)
     {
-
-        Debug.Log("Clearing search results.");
-        foreach (Transform child in _scrollViewContent)
+        foreach (Transform child in parentContainer)
         {
             Destroy(child.gameObject);
         }
     }
 
-    private void SetMovieImage(MovieSearchResult movie, Image image)
+    private void SetMovieImage(MovieImageReqInfo movie, Image image)
     {
         TMDbAPI.Instance.GetMovieImage(movie, (Texture2D texture) =>
         {

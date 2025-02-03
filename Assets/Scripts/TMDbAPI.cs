@@ -74,7 +74,7 @@ public class TMDbAPI : MonoBehaviour
         }
     }
 
-    public void GetMovieImage(MovieSearchResult movie, Action<Texture2D> callback)
+    public void GetMovieImage(MovieImageReqInfo movie, Action<Texture2D> callback)
     {
         if (string.IsNullOrEmpty(movie.poster_path))
         {
@@ -85,7 +85,7 @@ public class TMDbAPI : MonoBehaviour
         StartCoroutine(DownloadMovieImage(movie, callback));
     }
 
-    private IEnumerator DownloadMovieImage(MovieSearchResult movie, Action<Texture2D> callback)
+    private IEnumerator DownloadMovieImage(MovieImageReqInfo movie, Action<Texture2D> callback)
     {
         string imageUrl = $"{_baseImageUrl}{movie.poster_path}";
         UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl);
@@ -193,6 +193,13 @@ public class TMDbAPI : MonoBehaviour
         public float vote_average;
         public List<Genre> genres;
         public List<CastMember> cast;
+    }
+
+    [Serializable]
+    public class MovieImageReqInfo
+    {
+        public string title;
+        public string poster_path;
     }
 
     [Serializable]
