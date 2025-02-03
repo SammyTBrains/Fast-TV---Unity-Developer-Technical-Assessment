@@ -2,9 +2,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using System;
-using UnityEditor.Search;
 
 public class TMDbAPI : MonoBehaviour
 {
@@ -38,7 +36,7 @@ public class TMDbAPI : MonoBehaviour
         _apiKey = apiKey;
     }
 
-    public IEnumerator SearchMovies(string query, System.Action<List<MovieSearchResult>> onSuccess, System.Action<string> onError)
+    public IEnumerator SearchMovies(string query, Action<List<MovieSearchResult>> onSuccess, Action<string> onError)
     {
         string cacheKey = GetCacheKey(query);
 
@@ -78,7 +76,7 @@ public class TMDbAPI : MonoBehaviour
 
     public void GetMovieImage(MovieSearchResult movie, Action<Texture2D> callback)
     {
-        if (string.IsNullOrEmpty(movie.poster_path) )
+        if (string.IsNullOrEmpty(movie.poster_path))
         {
             callback?.Invoke(null);
             return;
@@ -102,12 +100,12 @@ public class TMDbAPI : MonoBehaviour
         else
         {
             Debug.LogError($"Error loading image ({imageUrl}): {request.error}");
-        
+
             callback?.Invoke(null);
         }
     }
 
-    public IEnumerator GetMovieDetails(int movieId, System.Action<MovieDetails> onSuccess, System.Action<string> onError)
+    public IEnumerator GetMovieDetails(int movieId, Action<MovieDetails> onSuccess, Action<string> onError)
     {
         string url = $"{BaseUrl}/movie/{movieId}?api_key={_apiKey}";
 
@@ -135,7 +133,7 @@ public class TMDbAPI : MonoBehaviour
 
     private void CacheResponse(string key, string jsonResponse)
     {
-        string timestamp = System.DateTime.UtcNow.ToString("O");
+        string timestamp = DateTime.UtcNow.ToString("O");
         PlayerPrefs.SetString(key, jsonResponse);
         PlayerPrefs.SetString($"{key}_timestamp", timestamp);
         PlayerPrefs.Save();
@@ -146,15 +144,18 @@ public class TMDbAPI : MonoBehaviour
         if (PlayerPrefs.HasKey(key))
         {
             string timestamp = PlayerPrefs.GetString($"{key}_timestamp");
-            System.DateTime cachedTime = System.DateTime.Parse(timestamp);
-            if ((System.DateTime.UtcNow - cachedTime).TotalMinutes < CacheExpiryMinutes)
+            DateTime cachedTime = DateTime.Parse(timestamp);
+            if ((DateTime.UtcNow - cachedTime).TotalMinutes < CacheExpiryMinutes)
             {
                 jsonResponse = PlayerPrefs.GetString(key);
                 return true;
             }
             else
             {
-                PlayerPrefs.DeleteKey(key);//Clean up cache
+                // Remove expired cache entry
+                PlayerPrefs.DeleteKey(key);
+                PlayerPrefs.DeleteKey($"{key}_timestamp");
+                PlayerPrefs.Save();
             }
         }
 
@@ -164,7 +165,7 @@ public class TMDbAPI : MonoBehaviour
     #endregion
 
     #region Data Models
-    [System.Serializable]
+    [Serializable]
     public class MovieSearchResult
     {
         public int id;
@@ -175,13 +176,13 @@ public class TMDbAPI : MonoBehaviour
         public float vote_average;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class MovieSearchResponse
     {
         public List<MovieSearchResult> results;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class MovieDetails
     {
         public int id;
@@ -194,14 +195,14 @@ public class TMDbAPI : MonoBehaviour
         public List<CastMember> cast;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class Genre
     {
         public int id;
         public string name;
     }
 
-    [System.Serializable]
+    [Serializable]
     public class CastMember
     {
         public string name;
