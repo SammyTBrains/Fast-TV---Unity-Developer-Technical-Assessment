@@ -8,6 +8,9 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
+    [SerializeField] private GameObject _apiKeyPromptPanel;
+    [SerializeField] private TMP_InputField _apiKeyInputField;
+
     [SerializeField] private TMP_InputField _searchInputField;
 
     [SerializeField] private GameObject _movieContainerPrefab;
@@ -33,10 +36,26 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    void Start()
+    public void ShowApiKeyPrompt()
     {
-        // GET THE SET API KEY BY USER - CHECK DOC TO CONFIRM
-        TMDbAPI.Instance.SetApiKey("5ef6b2bf288ba18b58b8deb349913ff0");
+        _searchScreen.SetActive(false);
+        _apiKeyPromptPanel.SetActive(true);
+    }
+
+    public void SubmitApiKey()
+    {
+        string apiKey = _apiKeyInputField.text.Trim();
+
+        if (!string.IsNullOrEmpty(apiKey))
+        {
+            TMDbAPI.Instance.SetApiKey(apiKey);
+            _apiKeyPromptPanel.SetActive(false);
+            _searchScreen.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("API Key cannot be empty!");
+        }
     }
 
     public void SearchMovies()

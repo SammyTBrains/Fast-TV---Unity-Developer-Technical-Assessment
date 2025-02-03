@@ -11,6 +11,7 @@ public class TMDbAPI : MonoBehaviour
     private const string BaseUrl = "https://api.themoviedb.org/3";
     private string _apiKey;
     private const string _baseImageUrl = "https://image.tmdb.org/t/p/w500";
+    private const string API_KEY_PREF = "TMDbAPIKey"; // PlayerPrefs key for storing API key
 
     private const string CachePrefix = "MovieSearchCache_";
     private const int CacheExpiryMinutes = 60;
@@ -27,6 +28,8 @@ public class TMDbAPI : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        LoadApiKey(); // Load the API key on startup
     }
     #endregion
 
@@ -34,6 +37,22 @@ public class TMDbAPI : MonoBehaviour
     public void SetApiKey(string apiKey)
     {
         _apiKey = apiKey;
+        PlayerPrefs.SetString(API_KEY_PREF, apiKey);
+        PlayerPrefs.Save();
+        Debug.Log("API Key saved.");
+    }
+
+    private void LoadApiKey()
+    {
+        if (PlayerPrefs.HasKey(API_KEY_PREF))
+        {
+            _apiKey = PlayerPrefs.GetString(API_KEY_PREF);
+        }
+        else
+        {
+            Debug.LogWarning("No API Key found. Prompting user...");
+            UIManager.Instance.ShowApiKeyPrompt();
+        }
     }
 
     public IEnumerator SearchMovies(string query, Action<List<MovieSearchResult>> onSuccess, Action<string> onError)
