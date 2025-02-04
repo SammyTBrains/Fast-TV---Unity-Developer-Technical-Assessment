@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using static TMDbAPI;
-using UnityEngine.UI;//Use defined data models
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour, IUIHandler
 {
