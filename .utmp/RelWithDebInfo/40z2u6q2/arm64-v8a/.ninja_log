@@ -1,0 +1,10 @@
+# ninja log v5
+1	6577	7603719135746035	GameActivity/CMakeFiles/game.dir/UGAConfiguration.cpp.o	5cf3dbb943d806d4
+38	6637	7603719136446024	GameActivity/CMakeFiles/game.dir/UGAEntry.cpp.o	d89e1a9dbb8280b5
+27	6639	7603719136446024	GameActivity/CMakeFiles/game.dir/UGAInputKeyEvent.cpp.o	ad4e82ce8bae07a
+95	6676	7603719137306025	GameActivity/CMakeFiles/game.dir/UGAInputMotionEvent.cpp.o	52bfcc4e564b4971
+117	6771	7603719138146035	GameActivity/CMakeFiles/game.dir/UGASoftKeyboard.cpp.o	aa88e71dfe356311
+19	6869	7603719139192956	GameActivity/CMakeFiles/game.dir/UGADebug.cpp.o	a205e9ad9e4ea3d8
+50	7069	7603719141221412	GameActivity/CMakeFiles/game.dir/UGAInput.cpp.o	b2473177ebe93cfe
+11	7264	7603719143292340	GameActivity/CMakeFiles/game.dir/UGAApplication.cpp.o	aa82ae76d66ee5aa
+7264	7867	7603719148385574	C:/Users/User/wkspaces/Fast TV - Unity Developer Technical Assessment/Library/Bee/Android/Prj/IL2CPP/Gradle/unityLibrary/build/intermediates/cxx/RelWithDebInfo/40z2u6q2/obj/arm64-v8a/libgame.so	575fa387791c3880
