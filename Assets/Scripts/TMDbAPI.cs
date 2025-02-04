@@ -93,7 +93,7 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
     }
 
     /// <summary>
-    /// Searches for movies using the TMDb API.
+    /// Searches for movies using the TMDb API and sorts the results by popularity.
     /// </summary>
     /// <param name="query">The search query.</param>
     /// <param name="onSuccess">Callback invoked when the search is successful.</param>
@@ -105,6 +105,7 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
 
         string cacheKey = GetCacheKey(query);
 
+        // Check if the response is cached
         if (TryGetCachedResponse(cacheKey, out string cachedResponse))
         {
             MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(cachedResponse);
@@ -115,7 +116,8 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
             yield break;
         }
 
-        string url = $"{BaseUrl}/search/movie?api_key={_apiKey}&query={UnityWebRequest.EscapeURL(query)}";
+        //Search API with sorting by popularity
+        string url = $"{BaseUrl}/search/movie?api_key={_apiKey}&query={UnityWebRequest.EscapeURL(query)}&sort_by=popularity.desc";
 
         using (UnityWebRequest request = UnityWebRequest.Get(url))
         {
