@@ -32,7 +32,7 @@ public class UIManager : MonoBehaviour, IUIHandler
 
     [SerializeField] private AudioClip _uiClickClip;
     [SerializeField] private GameObject _spinner;
-    [SerializeField] private GameObject _searchTextIns, _noResultsFoundText;
+    [SerializeField] private GameObject _searchTextIns, _noResultsFoundText, _somethingWentWrongPopUp;
     [SerializeField] private Sprite _imagePlaceHolder;
 
     private IMovieAPI movieAPI;
@@ -65,6 +65,7 @@ public class UIManager : MonoBehaviour, IUIHandler
         {
             case true:
                 _searchTextIns.SetActive(false);//Only needs to be set inactive once, at start
+                _noResultsFoundText.SetActive(false);
                 _spinner.SetActive(true); 
                 break;
             case false: 
@@ -213,12 +214,13 @@ public class UIManager : MonoBehaviour, IUIHandler
         {
             // Handle no results found in UI
             Debug.Log("No results found.");
-            // Example: Show a "No results found" message in the UI
+            ClearChildren(_scrollViewContent);
+            _noResultsFoundText.SetActive(true);
             return;
         }
 
         Debug.LogError($"Error: {error}");
-        // Example: Show an error message in the UI
+        _somethingWentWrongPopUp.SetActive(true);
     }
 
     /// <summary>

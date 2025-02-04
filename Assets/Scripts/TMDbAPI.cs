@@ -109,6 +109,8 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
         {
             MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(cachedResponse);
             onSuccess?.Invoke(response.results);
+            LoadingData = true;
+            yield return new WaitForSeconds(.2f);
             LoadingData = false;
             yield break;
         }
@@ -126,17 +128,18 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
             }
             else
             {
-                if (request.downloadHandler.text == null)
+                string jsonResponse = request.downloadHandler.text;
+                MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(jsonResponse);
+
+                if (response.total_results == 0)
                 {
                     onError?.Invoke("No results found.");
                     LoadingData = false;
                     yield break;
                 }
 
-                string jsonResponse = request.downloadHandler.text;
                 CacheResponse(cacheKey, jsonResponse);
 
-                MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(jsonResponse);
                 onSuccess?.Invoke(response.results);
                 LoadingData = false;
             }
@@ -291,6 +294,7 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
     public class MovieSearchResponse
     {
         public List<MovieSearchResult> results;
+        public int total_results;
     }
 
     /// <summary>
