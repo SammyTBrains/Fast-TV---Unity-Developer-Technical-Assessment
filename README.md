@@ -9,7 +9,6 @@ This is a Unity-based Android application that allows users to explore movies by
 
 - **Search Functionality**: Users can search for movies by title.
 - **Movie Details**: Displays detailed information about a selected movie, including posters, synopsis, release date, rating, genres, and cast.
-- **Responsive Design**: The UI adapts to both portrait and landscape orientations.
 - **Caching**: API responses are cached to improve performance and reduce redundant API calls.
 - **Error Handling**: Proper error handling for API calls and user input.
 

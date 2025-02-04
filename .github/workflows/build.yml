@@ -1,0 +1,80 @@
+name: Unity Build & Release
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+  workflow_dispatch: # Allows manual triggering
+
+jobs:
+  build:
+    name: Build and Test Unity Project
+    runs-on: ubuntu-latest
+
+    steps:
+      # ✅ Step 1: Checkout the Repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # ✅ Step 2: Install Unity
+      - name: Install Unity
+        uses: game-ci/unity-setup@v2
+        with:
+          unityVersion: 2022.3.8f1 # Update this to your Unity version
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      # ✅ Step 3: Run Unit Tests
+      - name: Run Unity Tests
+        uses: game-ci/unity-test-runner@v2
+        with:
+          projectPath: .
+          unityVersion: 2022.3.8f1
+
+      # ✅ Step 4: Build Android APK
+      - name: Build Android APK
+        uses: game-ci/unity-builder@v2
+        with:
+          projectPath: .
+          targetPlatform: Android
+          unityVersion: 2022.3.8f1
+          androidAppBundle: false
+
+      # ✅ Step 5: Upload the APK as an Artifact
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: built-apk
+          path: build/android/*.apk # Ensure this path matches your Unity build output
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      # ✅ Step 6: Checkout Repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # ✅ Step 7: Download the Built APK
+      - name: Download APK
+        uses: actions/download-artifact@v3
+        with:
+          name: built-apk
+          path: build/android/
+
+      # ✅ Step 8: Create GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/android/*.apk
+          tag_name: v1.0.${{ github.run_number }}
+          release_name: "Unity Build v1.0.${{ github.run_number }}"
+          body: "Automated Unity build and APK release."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
