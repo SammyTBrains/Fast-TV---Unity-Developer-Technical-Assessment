@@ -3,6 +3,9 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System;
 
+/// <summary>
+/// Contains unit tests for the TMDbAPI class.
+/// </summary>
 public class TMDbAPITests
 {
     [Test]
@@ -64,6 +67,9 @@ public class TMDbAPITests
     }
 
     #region Data Models
+    /// <summary>
+    /// Represents a movie search result.
+    /// </summary>
     [Serializable]
     public class MovieSearchResult
     {
@@ -75,12 +81,18 @@ public class TMDbAPITests
         public float vote_average;
     }
 
+    /// <summary>
+    /// Represents a response containing a list of movie search results.
+    /// </summary>
     [Serializable]
     public class MovieSearchResponse
     {
         public List<MovieSearchResult> results;
     }
 
+    /// <summary>
+    /// Represents detailed information about a movie.
+    /// </summary>
     [Serializable]
     public class MovieDetails
     {
@@ -94,6 +106,9 @@ public class TMDbAPITests
         public List<CastMember> cast;
     }
 
+    /// <summary>
+    /// Represents a movie genre.
+    /// </summary>
     [Serializable]
     public class Genre
     {
@@ -101,6 +116,9 @@ public class TMDbAPITests
         public string name;
     }
 
+    /// <summary>
+    /// Represents a cast member in a movie.
+    /// </summary>
     [Serializable]
     public class CastMember
     {

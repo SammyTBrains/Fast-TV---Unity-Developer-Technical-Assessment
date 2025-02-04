@@ -1,3 +1,6 @@
+/// <summary>
+/// Defines the contract for handling UI-related operations.
+/// </summary>
 public interface IUIHandler
 {
     void ShowApiKeyPrompt();

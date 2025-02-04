@@ -4,6 +4,9 @@ using System;
 using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Defines the contract for interacting with the TMDb API.
+/// </summary>
 public interface IMovieAPI
 {
     void SetApiKey(string apiKey);
