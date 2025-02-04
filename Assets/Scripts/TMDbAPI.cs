@@ -23,6 +23,8 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
     private const string CachePrefix = "MovieSearchCache_";
     private const int CacheExpiryMinutes = 60;
 
+    private bool APILoaded;
+
     private IUIHandler uIHandler;
 
     /// <summary>
@@ -46,8 +48,14 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
         {
             Destroy(gameObject);
         }
+    }
 
-        LoadApiKey(); // Load the API key on startup
+    private void Update()
+    {
+        if (uIHandler != null && !APILoaded)
+        {
+            LoadApiKey(); // Load the API key on startup
+        }
     }
     #endregion
 
@@ -78,6 +86,8 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
             Debug.LogWarning("No API Key found. Prompting user...");
             uIHandler.ShowApiKeyPrompt();
         }
+
+        APILoaded = true;
     }
 
     /// <summary>
