@@ -76,53 +76,73 @@ MovieExplorationApp/
 1. **Clone the Repository**:
 
    ```bash
-   git clone https://github.com/your-username/MovieExplorationApp.git
+   git clone https://github.com/SammyTBrains/Fast-TV---Unity-Developer-Technical-Assessment.git
    ```
 
 2. **Open in Unity**:
 
-   - Open the project in Unity (version 2020.3 or later).
+   - Open the project in Unity (version 6000.0.23 or later).
    - Ensure the **Android Build Support** module is installed.
 
 3. **Set Up TMDb API Key**:
 
-   - Obtain an API key from [TMDb](https://www.themoviedb.org/settings/api).
+   - **IMPORTANT**: Obtain an API key from [TMDb](https://www.themoviedb.org/settings/api).
    - Enter the API key in the app when prompted on first launch.
+   - **WARNING**: If the API key is incorrect or missing, movies will not be fetched. Ensure the API key is valid and properly entered.
 
 4. **Build and Run**:
    - Go to `File > Build Settings`.
    - Select **Android** as the platform and click `Switch Platform`.
-   - Connect an Android device or use an emulator.
+   - Connect an Android device (preferrably) or use an emulator.
    - Click `Build and Run`.
 
 ---
 
-## **Documentation**
+## **APK Download**
 
-- **[TMDbAPI Documentation](Documentation/TMDbAPI.md)**: Detailed documentation for the `TMDbAPI` class.
-- **[UIManager Documentation](Documentation/UIManager.md)**: Detailed documentation for the `UIManager` class.
-- **[GameManager Documentation](Documentation/GameManager.md)**: Detailed documentation for the `GameManager` class.
+Download the latest APK from the [Releases](https://github.com/SammyTBrains/Fast-TV---Unity-Developer-Technical-Assessment/releases) page.
 
 ---
 
 ## **Demo**
 
-[Watch a demo of the app here](https://www.youtube.com/demo-link) (replace with your actual demo link).
+[Watch a demo of the app here](https://drive.google.com/file/d/1u3G0KTE4RSxx32-aEK0yQyLLDSEt7Ehl/view?usp=sharing).
+
+---
+
+## **Design Decisions and Trade-offs**
+
+1. **Singleton Pattern**:
+
+   - Used for `TMDbAPI`, `UIManager`, and `GameManager` to ensure a single instance of each class.
+   - Trade-off: Global state can make testing and debugging more challenging.
+
+2. **Caching**:
+
+   - API responses are cached using `PlayerPrefs` to reduce redundant API calls.
+   - Trade-off: Cached data may become stale if not properly invalidated.
+
+3. **Dependency Injection**:
+
+   - `GameManager` injects dependencies between `TMDbAPI` and `UIManager` to decouple components.
+   - Trade-off: Adds some complexity to the initialization process.
+
+4. **Error Handling**:
+   - Basic error handling is implemented for API calls and user input.
+   - Trade-off: Limited handling of edge cases (e.g., network timeouts).
 
 ---
 
 ## **Known Issues and Limitations**
 
-- **No Offline Mode**: The app requires an internet connection to fetch data.
-- **Limited Error Handling**: Some edge cases (e.g., invalid API key) are not fully handled.
 - **UI Scaling**: The UI may not scale perfectly on all devices.
 
 ---
 
-## **Future Improvements**
+## **Possible Improvements**
 
-- **Offline Mode**: Cache search results and movie details for offline access.
-- **Enhanced UI**: Add animations and transitions for a smoother user experience.
+- **Enhanced UI**: Even more animations and clean look for a smoother user experience.
+- **Responsivity**: Much better responsivity for portrait mode
 - **Pagination**: Implement pagination for search results with many entries.
 - **Localization**: Support multiple languages for a global audience.
 
@@ -138,17 +158,17 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## **License**
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
----
-
 ## **Contact**
 
 For questions or feedback, please contact:
 
-- **Your Name**: your.email@example.com
-- **GitHub**: [your-username](https://github.com/your-username)
+- **Your Name**: josephsamuel034@gmail.com
+- **GitHub**: [your-username](https://github.com/SammyTBrains)
+
+---
+
+### **Important Note**
+
+**MAKE SURE YOUR TMDb API KEY IS CORRECT. IF THE API KEY IS INVALID OR MISSING, MOVIES WILL NOT BE FETCHED.**
 
 ---
