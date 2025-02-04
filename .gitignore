@@ -61,6 +61,8 @@ sysinfo.txt
 *.unitypackage
 *.app
 
+android-release.keystore
+
 # Crashlytics generated file
 crashlytics-build.properties
 

@@ -37,6 +37,10 @@ jobs:
         run: |
           echo "${{ secrets.UNITY_KEYSTORE_BASE64 }}" | base64 --decode > android-release.keystore
 
+      # Step 4: Clean Untracked Changes to Fix "Branch is Dirty" Error
+      - name: Clean uncommitted changes
+        run: git reset --hard && git clean -fd
+
       # Step 5: Install Unity and Build the Project
       - uses: game-ci/unity-builder@v4
         env:
