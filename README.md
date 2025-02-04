@@ -162,7 +162,7 @@ Contributions are welcome! Please follow these steps:
 
 For questions or feedback, please contact:
 
-- **Your Name**: josephsamuel034@gmail.com
+- **Email**: josephsamuel034@gmail.com
 - **GitHub**: [SammyTBrains](https://github.com/SammyTBrains)
 
 ---
