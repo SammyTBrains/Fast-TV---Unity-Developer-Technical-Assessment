@@ -1,28 +1,36 @@
-name: Build project
+name: Build and Test Project
 
 on: push
 
 jobs:
-  buildForAllSupportedPlatforms:
-    name: Build for ${{ matrix.targetPlatform }}
+  buildAndTest:
+    name: Build, Test, and Release
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         targetPlatform:
           - Android # Build an Android .apk standalone app.
+
     steps:
+      # Step 1: Checkout the repository
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           lfs: true
+
+      # Step 2: Cache Unity Library to speed up builds
       - uses: actions/cache@v3
         with:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
           restore-keys: Library-
+
+      # Step 3: Free up disk space (required for Android builds)
       - if: matrix.targetPlatform == 'Android'
         uses: jlumbroso/free-disk-space@v1.3.1
+
+      # Step 4: Install Unity and build the project
       - uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -30,7 +38,43 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
+          buildName: MovieExplorationApp
+          buildsPath: build/${{ matrix.targetPlatform }}
+
+      # Step 5: Run unit tests
+      - name: Run Unit Tests
+        uses: game-ci/unity-test-runner@v2
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          testMode: editmode # Run tests in Edit Mode
+
+      # Step 6: Upload the APK as a build artifact
       - uses: actions/upload-artifact@v4
         with:
           name: Build-${{ matrix.targetPlatform }}
           path: build/${{ matrix.targetPlatform }}
+
+      # Step 7: Create a GitHub release and attach the APK
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v1.0.0-${{ github.sha }}
+          release_name: Release v1.0.0
+          draft: false
+          prerelease: false
+
+      - name: Upload APK to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/${{ matrix.targetPlatform }}/MovieExplorationApp.apk
+          asset_name: MovieExplorationApp.apk
+          asset_content_type: application/vnd.android.package-archive
