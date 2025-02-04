@@ -32,6 +32,7 @@ public class UIManager : MonoBehaviour, IUIHandler
 
     [SerializeField] private AudioClip _uiClickClip;
     [SerializeField] private GameObject _spinner;
+    [SerializeField] private GameObject _searchTextIns, _noResultsFoundText;
 
     private IMovieAPI movieAPI;
 
@@ -62,6 +63,7 @@ public class UIManager : MonoBehaviour, IUIHandler
         switch (movieAPI.LoadingData)
         {
             case true:
+                _searchTextIns.SetActive(false);//Only needs to be set inactive once, at start
                 _spinner.SetActive(true); 
                 break;
             case false: 
