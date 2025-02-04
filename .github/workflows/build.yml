@@ -6,6 +6,8 @@ jobs:
   buildAndTest:
     name: Build, Test, and Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Grant write permissions to the GITHUB_TOKEN
     strategy:
       fail-fast: false
       matrix:
@@ -49,7 +51,7 @@ jobs:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
-          unityVersion: 2020.3.33f1 # Specify a valid Unity version
+          unityVersion: 6000.0.23f1 # Specify a valid Unity version
           testMode: editmode # Run tests in Edit Mode
 
       # Step 6: Upload the APK as a build artifact
