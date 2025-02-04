@@ -1371,7 +1371,7 @@ MonoBehaviour:
   _apiKeyInputField: {fileID: 611831534}
   _searchInputField: {fileID: 371550606}
   _movieContainerPrefab: {fileID: 3550747892034187063, guid: 0d70119f569b9084e8c4d0f0bc8dec09, type: 3}
-  _scrollViewContent: {fileID: 373294619}
+  _searchResutsScrollViewContent: {fileID: 373294619}
   _searchScreen: {fileID: 396006582}
   _movieDetailsScreen: {fileID: 1680110917}
   _movieDetailsScreenContent: {fileID: 977810039}

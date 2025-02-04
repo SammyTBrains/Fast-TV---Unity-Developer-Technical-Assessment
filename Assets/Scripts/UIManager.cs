@@ -15,21 +15,27 @@ public class UIManager : MonoBehaviour, IUIHandler
     /// </summary>
     public static UIManager Instance { get; private set; }
 
+    [Header("API")]
     [SerializeField] private GameObject _apiKeyPromptPanel;
     [SerializeField] private TMP_InputField _apiKeyInputField;
 
+    [Header("")]
     [SerializeField] private TMP_InputField _searchInputField;
 
+    [Header("Search Content")]
     [SerializeField] private GameObject _movieContainerPrefab;
-    [SerializeField] private Transform _scrollViewContent;
+    [SerializeField] private Transform _searchResutsScrollViewContent;
 
+    [Header("Screens")]
     [SerializeField] private GameObject _searchScreen;
     [SerializeField] private GameObject _movieDetailsScreen;
 
+    [Header("Movie Details")]
     [SerializeField] private Transform _movieDetailsScreenContent;
     [SerializeField] private GameObject _genrePrefab, _genreContainer;
     [SerializeField] private GameObject _castPrefab, _castContainer;
 
+    [Header("Utilities")]
     [SerializeField] private AudioClip _uiClickClip;
     [SerializeField] private GameObject _spinner;
     [SerializeField] private GameObject _searchTextIns, _noResultsFoundText, _somethingWentWrongPopUp;
@@ -46,6 +52,7 @@ public class UIManager : MonoBehaviour, IUIHandler
         this.movieAPI = movieAPI;
     }
 
+    #region MonoBehaviour Methods
     private void Awake()
     {
         if (Instance == null)
@@ -73,6 +80,7 @@ public class UIManager : MonoBehaviour, IUIHandler
                 break;
         }
     }
+    #endregion
 
     /// <summary>
     /// Displays the API key prompt panel.
@@ -83,6 +91,7 @@ public class UIManager : MonoBehaviour, IUIHandler
         _apiKeyPromptPanel.SetActive(true);
     }
 
+    #region Buttons Actions
     /// <summary>
     /// Submits the API key entered by the user.
     /// </summary>
@@ -136,18 +145,20 @@ public class UIManager : MonoBehaviour, IUIHandler
     {
         AudioSource.PlayClipAtPoint(audioClip, Camera.main.transform.position);
     }
+    #endregion
 
+    #region Callbacks
     /// <summary>
     /// Handles successful movie search results.
     /// </summary>
     /// <param name="results">The list of movie search results.</param>
     private void OnSearchSuccess(List<MovieSearchResult> results)
     {
-        ClearChildren(_scrollViewContent);
+        ClearChildren(_searchResutsScrollViewContent);
 
         foreach (MovieSearchResult movie in results)
         {
-            GameObject newMovie = Instantiate(_movieContainerPrefab, _scrollViewContent);
+            GameObject newMovie = Instantiate(_movieContainerPrefab, _searchResutsScrollViewContent);
 
             MovieImageReqInfo info = new MovieImageReqInfo();
             info.title = movie.title;
@@ -214,7 +225,7 @@ public class UIManager : MonoBehaviour, IUIHandler
         {
             // Handle no results found in UI
             Debug.Log("No results found.");
-            ClearChildren(_scrollViewContent);
+            ClearChildren(_searchResutsScrollViewContent);
             _noResultsFoundText.SetActive(true);
             return;
         }
@@ -222,7 +233,9 @@ public class UIManager : MonoBehaviour, IUIHandler
         Debug.LogError($"Error: {error}");
         _somethingWentWrongPopUp.SetActive(true);
     }
+    #endregion
 
+    #region Utilities
     /// <summary>
     /// Clears all child objects of a parent container.
     /// </summary>
@@ -260,4 +273,5 @@ public class UIManager : MonoBehaviour, IUIHandler
     {
         return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
     }
+    #endregion
 }
