@@ -33,6 +33,7 @@ public class UIManager : MonoBehaviour, IUIHandler
     [SerializeField] private AudioClip _uiClickClip;
     [SerializeField] private GameObject _spinner;
     [SerializeField] private GameObject _searchTextIns, _noResultsFoundText;
+    [SerializeField] private Sprite _imagePlaceHolder;
 
     private IMovieAPI movieAPI;
 
@@ -178,7 +179,7 @@ public class UIManager : MonoBehaviour, IUIHandler
         info.title = movieDetails.title;
         info.poster_path = movieDetails.poster_path;
 
-        _movieDetailsScreenContent.Find("Poster").GetComponent<Image>().sprite = null;//Clear previous Image
+        _movieDetailsScreenContent.Find("Poster").GetComponent<Image>().sprite = _imagePlaceHolder;
         SetMovieImage(info, _movieDetailsScreenContent.Find("Poster").GetComponent<Image>());
         _movieDetailsScreenContent.Find("Title").GetComponent<TMP_Text>().text = movieDetails.title;
         _movieDetailsScreenContent.Find("Release Date").GetComponent<TMP_Text>().text = movieDetails.release_date;
