@@ -30,6 +30,9 @@ public class UIManager : MonoBehaviour, IUIHandler
     [SerializeField] private GameObject _genrePrefab, _genreContainer;
     [SerializeField] private GameObject _castPrefab, _castContainer;
 
+    [SerializeField] private AudioClip _uiClickClip;
+    [SerializeField] private GameObject _spinner;
+
     private IMovieAPI movieAPI;
 
     /// <summary>
@@ -51,6 +54,19 @@ public class UIManager : MonoBehaviour, IUIHandler
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void Update()
+    {
+        switch (movieAPI.LoadingData)
+        {
+            case true:
+                _spinner.SetActive(true); 
+                break;
+            case false: 
+                _spinner.SetActive(false); 
+                break;
         }
     }
 
@@ -96,6 +112,7 @@ public class UIManager : MonoBehaviour, IUIHandler
     /// <param name="movieId">The ID of the movie.</param>
     private void GetMovieDetails(int movieId)
     {
+        PlayButtonClick(_uiClickClip);
         StartCoroutine(movieAPI.GetMovieDetails(movieId, OnMovieDetailsSuccess, OnError));
     }
 
@@ -106,6 +123,14 @@ public class UIManager : MonoBehaviour, IUIHandler
     {
         _movieDetailsScreen.SetActive(false);
         _searchScreen.SetActive(true);
+    }
+
+    /// <summary>
+    /// Plays Audio clip at camera's postion.
+    /// </summary>
+    public void PlayButtonClick(AudioClip audioClip)
+    {
+        AudioSource.PlayClipAtPoint(audioClip, Camera.main.transform.position);
     }
 
     /// <summary>
@@ -129,7 +154,6 @@ public class UIManager : MonoBehaviour, IUIHandler
             newMovie.transform.Find("Release Date").GetComponent<TMP_Text>().text = movie.release_date;
             newMovie.transform.Find("Overview").GetComponent<TMP_Text>().text = movie.overview;
 
-            // Get the Button component
             Button movieButton = newMovie.GetComponent<Button>();
             if (movieButton != null)
             {

@@ -27,6 +27,8 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
 
     private IUIHandler uIHandler;
 
+    public bool LoadingData { get; private set; }
+
     /// <summary>
     /// Sets the UI handler for displaying API-related messages and prompts.
     /// </summary>
@@ -99,12 +101,15 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
     /// <returns>An IEnumerator for coroutine support.</returns>
     public IEnumerator SearchMovies(string query, Action<List<MovieSearchResult>> onSuccess, Action<string> onError)
     {
+        LoadingData = true;
+
         string cacheKey = GetCacheKey(query);
 
         if (TryGetCachedResponse(cacheKey, out string cachedResponse))
         {
             MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(cachedResponse);
             onSuccess?.Invoke(response.results);
+            LoadingData = false;
             yield break;
         }
 
@@ -117,12 +122,14 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
             if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
             {
                 onError?.Invoke(request.error);
+                LoadingData = false;
             }
             else
             {
                 if (request.downloadHandler.text == null)
                 {
                     onError?.Invoke("No results found.");
+                    LoadingData = false;
                     yield break;
                 }
 
@@ -131,6 +138,7 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
 
                 MovieSearchResponse response = JsonUtility.FromJson<MovieSearchResponse>(jsonResponse);
                 onSuccess?.Invoke(response.results);
+                LoadingData = false;
             }
         }
     }
@@ -185,6 +193,7 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
     /// <returns>An IEnumerator for coroutine support.</returns>
     public IEnumerator GetMovieDetails(int movieId, Action<MovieDetails> onSuccess, Action<string> onError)
     {
+        LoadingData = true;
         string url = $"{BaseUrl}/movie/{movieId}?api_key={_apiKey}";
 
         using UnityWebRequest request = UnityWebRequest.Get(url);
@@ -193,12 +202,14 @@ public class TMDbAPI : MonoBehaviour, IMovieAPI
         if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
         {
             onError?.Invoke(request.error);
+            LoadingData = false;
         }
         else
         {
             string jsonResponse = request.downloadHandler.text;
             MovieDetails movieDetails = JsonUtility.FromJson<MovieDetails>(jsonResponse);
             onSuccess?.Invoke(movieDetails);
+            LoadingData = false;
         }
     }
     #endregion

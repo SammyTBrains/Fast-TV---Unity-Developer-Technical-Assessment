@@ -9,6 +9,7 @@ using System.Collections;
 /// </summary>
 public interface IMovieAPI
 {
+    bool LoadingData { get; }
     void SetApiKey(string apiKey);
     IEnumerator SearchMovies(string query, Action<List<MovieSearchResult>> onSuccess, Action<string> onError);
     IEnumerator GetMovieDetails(int movieId, Action<MovieDetails> onSuccess, Action<string> onError);
